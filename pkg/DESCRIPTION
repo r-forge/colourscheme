@@ -1,0 +1,13 @@
+Package: colourschemes
+Type: Package
+Title: Data-driven colour scheme mappers
+Version: 0.1
+Date: 2009-05-26
+Author: Barry Rowlingson
+Maintainer: Barry Rowlingson <b.rowlingson@lancaster.ac.uk>
+Depends: R (>= 2.7.0), RColorBrewer, colorRamps
+Description: Create functions for mapping data to colours
+License: GPL-3
+LazyLoad: yes
+
+

@@ -8,20 +8,33 @@
 
 \maketitle
 
-R has several functions that produce or manipulate colours. It also
-has functions that produce or manipulate vectors of colours (colour
-palettes), and some functions for producing colour ramps. But these
-functions do not take care of the final step of producing a graphic
-from your data - that of controlling which colour comes from what data
-value.
+\section*{Colours in R}
 
-% relevant fns: palette(), rainbow() etc, colorRamp()
-% relevant pks: RColorBrewer, colorRamps, dichromat
-% other stuff: ggplot, lattice
+Colour is an important factor in statistical graphics, especially
+now that cheap colour printers are available. Many of R's graphics
+functions use colour, and colours can be specified as RGB triples or
+via a large set of names.
+
+R has several functions that produce or manipulate colours 
+(see \texttt{colors}, \texttt{rgb}, \texttt{hcl} etc) and also
+functions that produce or manipulate vectors of colours 
+(see \texttt{palette}, \texttt{rainbow}, \texttt{colorRamp}) in its default
+packages. Add-on packages provide further colour-related functionality
+(see \texttt{colorRamps}, \texttt{colorspace}, \texttt{dichromat},
+\texttt{plotrix} packages). The \texttt{ggplot2} package also has
+several functions for colour handling within its graphics system.
+
+What these functions lack is a way of easily controlling the mapping
+from your data to a colour value. If you are using \texttt{rainbow(10)} 
+to plot data that spans the interval [-3,9], what colour is 5.45 going to
+be?
+
+\section*{Colour Scheme Functions}
 
 This package aims to fill that gap by providing the means to create
 {\em colour scheme} functions. A colour scheme function is an R function
 that takes data values as argument and produces colours as an output. 
+
 Access the package functions in the usual way with the R \texttt{library} 
 function:
 
@@ -32,9 +45,9 @@ function:
 The package provides constructors that return colour scheme functions. The 
 general way of working is like this:
 \begin{Scode}
-> sc = specificScheme(data,colours,etc)
-> c1 = sc(data)
-> c2 = sc(newdata)
+> sc = whicheverScheme(data,colours,etc)
+> c1 = sc(data)     # vector of colours
+> c2 = sc(newdata)  # another vector of colours
 \end{Scode}
 
 Firstly you construct a function (\texttt{sc} here) using a specific
@@ -45,12 +58,19 @@ the function is fixed according to the scheme and the parameters, and the
 returned colours are only dependent on the argument. This way you can
 be sure that the mapping of data values to colours is constant.
 
+\section*{Colours For Factors}
+
 A simple colour scheme function is one that produces a colour for each
 level of a factor. The function \texttt{factorScheme} does that:
 
 
 <<echo=FALSE>>=
-library(colourschemes,lib.loc="/home/rowlings/Work/R/ColourSchemes/pkg.Rcheck")
+library(colourschemes,lib.loc="../../../pkg.Rcheck")
+showScheme = function(limit,scheme){
+  d=data.frame(x=limit,y=rep(0,length(limit)))
+  plot(d$x,d$y,col=scheme(d$x),pch=15,axes=FALSE,ylab="",xlab="",cex=2)
+  axis(1)
+}
 @ 
 <<>>=
 f = factor(c("a","a","b","a","c"))
@@ -59,7 +79,9 @@ fs(f)
 @ 
 
 The function \texttt{fs} can be re-used with any data that has the same
-levels as the original source, to guarantee that the same colours are used:
+levels as the original source, to guarantee that the same colours are used. Here 
+we use the \texttt{fs} function as an argument to the \texttt{col=} argument
+to colour plotted points correctly:
 
 <<fig=TRUE>>=
 g = factor(c("c","b","a"))
@@ -71,9 +93,9 @@ text(4.5,4.5,"f")
 text(1.75,4,"g")
 @ 
 
-That's about as much as you can do with categorical data - a
-one-to-one mapping of levels to colours. Continuous data has more
-possibilities.
+\section*{Univariate Continuous Colours}
+
+\subsection*{Nearest Colour}
 
 The {\em nearest} scheme takes a data frame of values and colours and 
 produces a colour scheme function that maps data values to the 
@@ -83,11 +105,67 @@ colour corresponding to the nearest value in the data frame.
 ns = nearestScheme(data.frame(
   values=c(0,1,2),col=c("red","blue","green")
   ))
-s=seq(-.5,2.5,by=0.5)
-rbind(s,ns(s))
+@ 
+<<fig=TRUE, width=6, height=2, echo=FALSE>>=
+showScheme(seq(-2.5,2.5,len=20),ns)
 @ 
 
 
+\subsection*{Ramp Interpolation}
+The {\em ramp interpolation} scheme produces colours that map a range of 
+numeric values onto a colour ramp. The ramp is produced using the base \texttt{colorRamp}
+function, and extra ``...'' arguments are passed through to that. This gives a way
+of controlling the specifics of the interpolation such as whether to interpolate in 
+RGB or CIE Lab colour space. 
+<<>>=
+rs = rampInterpolate(limits=c(-2, 2), ramp = c("red", "yellow", "blue"))
+@ 
+<<fig=TRUE, width=6, height=2, echo=FALSE>>=
+showScheme(seq(-3,3,len=20),rs)
+@ 
+
+Note that colours outside the set limits are returned as \texttt{NA}, and so 
+result in invisible points.
+
+Since you can give any vector of colour values to \texttt{colorRamp}, you can pass
+through a palette for interpolation, such as one of the \texttt{RColorBrewer} palettes:
+<<>>=
+require(RColorBrewer)
+rs2 = rampInterpolate(c(-2,2),brewer.pal(5,"PuOr"))
+@ 
+<<fig=TRUE, width=6, height=2, echo=FALSE>>=
+showScheme(seq(-2,2,len=20),rs2)
+@ 
+
+\subsection*{Multiple Ramp Interpolation}
+In some fields, complex colour ramps are used. For example in topographical mapping
+there may be a range of blues for underwater values (below zero), then a ramp of
+green to brown as altitude increases, then a sudden and flat white for the snowline. 
+The {\em multi ramp} scheme handles these cases.
+
+Its arguments are a data frame of min-max values for each ramp, and a list of ramp
+specifications as used in the \texttt{rampInterpolate} function, but without the 
+facility to pass extra ``...'' parameters to \texttt{colorRamp}. Any gaps
+between the min-max values will return an \texttt{NA} instead of a colour.
+
+Here is a sample topographical multiple ramp scheme. The ocean sinks away to
+black, and the snowline is at 1000 units up. I've made the ice gray so it shows
+on a white background:
+
+<<>>=
+tramp = multiRamp(rbind(c(-2000,0),c(0,1000),c(1000,9000)),
+  list(c("black","blue"),c("green","brown"),c("gray70","gray70"))
+  )
+@ 
+<<fig=TRUE, width=6, height=2, echo=FALSE>>=
+showScheme(seq(-2000,2000,len=20),tramp)
+@ 
+
+
+\section*{Multivariate Continuous Colours}
+Haven't done any of these yet.
+
+\section*{Examples}
 
 
 <<fig=TRUE>>=
@@ -108,7 +186,7 @@ schemes[[length(schemes)+1]] =
   rampInterpolate(srange,brewer.pal(5,"PuOr"))
 
 schemes[[length(schemes)+1]] =
-  multiRamp(rbind(c(-2,0),c(0,1),c(1,2)),list(c("black","blue"),c("yellow","brown"),c("green","white")))
+  multiRamp(rbind(c(-2,0),c(0,.6),c(.6,2)),list(c("black","blue"),c("yellow","brown"),c("green","white")))
 
 nt = length(schemes)
 plot(srange,c(1,nt+1),type='n',xlab="",ylab="",axes=FALSE,main="colour schemes")

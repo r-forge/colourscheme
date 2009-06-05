@@ -163,7 +163,74 @@ showScheme(seq(-2000,2000,len=20),tramp)
 
 
 \section*{Multivariate Continuous Colours}
-Haven't done any of these yet.
+
+\subsection*{The rgb Scheme}
+This scheme simply maps sets of three values in your data to red, green, and blue values
+which it feeds to the \texttt{rgb} function. By default it scales red to the full range of
+the first data value, green to the full range of the second, and so on. The \texttt{equalScale}
+parameter can be used so that each of the colours is scaled depending on the global scale
+of all three input data values.
+<<>>=
+m3=matrix(sample(1:12),4,3)
+print(m3)
+r=rgbScheme(m3,equalScale=TRUE)
+r(m3)
+r=rgbScheme(m3,equalScale=FALSE)
+r(m3)
+@ 
+
+\subsection*{The hsv Scheme}
+This scheme is similar to the rgb scheme but instead passes the values to the \texttt{hsv}
+function, so the three columns of the data refer to hue, saturation, and colour value.
+<<>>=
+h=hsvScheme(m3,equalScale=FALSE)
+h(m3)
+@
+
+\subsection*{The ``f3'' Scheme}
+The rgb and hsv schemes are specialised cases of the ``f3'' scheme. This scheme
+takes a function as parameter in its constructor that takes three equal-length vector 
+arguments and returns colour values. The existing \texttt{rgb} and \texttt{hsv} functions
+in R fit this pattern, but you can write your own. The constructor also takes the
+\texttt{equalScale} argument and needs a label string to identify your scheme.
+
+For example, suppose you have bivariate data and want to represent the first variable
+as a variation in the redness, and the second variable as variation in greenness, and
+with no blue. Write an \texttt{rg} function:
+<<>>=
+rg <- function(r,g,b){return(rgb(r,g,0))}
+@ 
+
+That function maps values of \texttt{r} and \texttt{g} from 0 to 1. So now we wrap it in
+an \texttt{f3Scheme} function, to get a colour scheme that is bound to our data ranges:
+
+<<fig=TRUE>>=
+m=matrix(10*runif(300),ncol=3)
+rg <- function(r,g,b){return(rgb(r,g,0))}
+rgs=f3Scheme(m,rg,"rg scheme")
+plot(m[,1],m[,2],col=rgs(m),pch=19,xlab="more red",ylab="more green")
+@ 
+
+\section*{Scheme Information}
+Each colour scheme function object has a \texttt{schemeData} method that
+returns a list giving the specification of the scheme. This list can be fed 
+back into the scheme constructor function with \texttt{do.call}. If unmodified,
+you will get back an identical colour scheme function, but this is useful if you
+wish to slightly modify an existing colour scheme function. Here we raise the 
+snowline from the multiple ramp example to 1800:
+<<>>=
+sd = schemeData(tramp)
+print(sd$ranges)
+# lets raise the snowline
+sd$ranges[2,2]=1500
+sd$ranges[3,1]=1500
+tramp2 = do.call(multiRamp,sd)
+@ 
+
+<<fig=TRUE, width=6, height=2, echo=FALSE>>=
+showScheme(seq(-2000,2000,len=20),tramp2)
+@ 
+
 
 \section*{Examples}
 

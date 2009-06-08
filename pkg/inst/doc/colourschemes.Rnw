@@ -1,5 +1,13 @@
 \documentclass{article}
 
+\usepackage{listings}
+\usepackage{Sweave}
+\SweaveOpts{keep.source=TRUE}
+<<<SweaveListingspreparations, results=tex, echo=FALSE>>=
+require(SweaveListingUtils)
+SweaveListingPreparations()
+@
+
 \title{Colour Schemes}
 
 \author{Barry Rowlingson}
@@ -64,7 +72,7 @@ A simple colour scheme function is one that produces a colour for each
 level of a factor. The function \texttt{factorScheme} does that:
 
 
-<<echo=FALSE>>=
+<<echo=FALSE,results=hide>>=
 library(colourschemes,lib.loc="../../../pkg.Rcheck")
 showScheme = function(limit,scheme){
   d=data.frame(x=limit,y=rep(0,length(limit)))
@@ -188,11 +196,14 @@ h(m3)
 @
 
 \subsection*{The ``f3'' Scheme}
-The rgb and hsv schemes are specialised cases of the ``f3'' scheme. This scheme
-takes a function as parameter in its constructor that takes three equal-length vector 
-arguments and returns colour values. The existing \texttt{rgb} and \texttt{hsv} functions
-in R fit this pattern, but you can write your own. The constructor also takes the
-\texttt{equalScale} argument and needs a label string to identify your scheme.
+
+The rgb and hsv schemes are specialised cases of the ``f3''
+scheme. This scheme takes a function as parameter in its constructor
+that takes three equal-length vector arguments that range from 0 to 1
+and returns colour values. The existing \texttt{rgb} and \texttt{hsv}
+functions in R fit this pattern, but you can write your own. The
+constructor also takes the \texttt{equalScale} argument and needs a
+label string to identify your scheme.
 
 For example, suppose you have bivariate data and want to represent the first variable
 as a variation in the redness, and the second variable as variation in greenness, and
@@ -207,7 +218,7 @@ an \texttt{f3Scheme} function, to get a colour scheme that is bound to our data 
 <<fig=TRUE>>=
 m=matrix(10*runif(300),ncol=3)
 rg <- function(r,g,b){return(rgb(r,g,0))}
-rgs=f3Scheme(m,rg,"rg scheme")
+rgs=f3Scheme(m,rg,"red-green scheme")
 plot(m[,1],m[,2],col=rgs(m),pch=19,xlab="more red",ylab="more green")
 @ 
 
@@ -231,6 +242,23 @@ tramp2 = do.call(multiRamp,sd)
 showScheme(seq(-2000,2000,len=20),tramp2)
 @ 
 
+\section*{Writing Your Own Colour Schemes}
+\begin{Scode}
+myScheme = function(options){
+  force(options)
+  f = function(data){
+    colours=someFunction(data,options)
+    return(colours)
+  }
+  class(f)= c("myScheme","colourScheme","function")
+  attr(f,"type")="my scheme"
+  return(f)
+  }
+  
+schemeData.myScheme = function(object){
+  return(list(options=get("options",env=environment(object))))
+  } 
+\end{Scode}
 
 \section*{Examples}
 

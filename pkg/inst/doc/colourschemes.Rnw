@@ -243,22 +243,59 @@ showScheme(seq(-2000,2000,len=20),tramp2)
 @ 
 
 \section*{Writing Your Own Colour Schemes}
+If you want to write your own colour scheme functions that conform to the
+existing ones, here is how you do it.
+
+First, define a new scheme function:
 \begin{Scode}
-myScheme = function(options){
-  force(options)
+myScheme = function(a,b,c){
+\end{Scode}
+
+This function takes whatever data and options are needed. Then you need to make sure
+these options are evaluated in order to fix their values. Use the \texttt{force} function
+for this:
+
+\begin{Scode}
+  force(a)
+  force(b)
+  force(c)
+\end{Scode}
+
+Next we create a function within this function that only takes the new data as argument:
+
+\begin{Scode}
   f = function(data){
-    colours=someFunction(data,options)
+    colours=someFunction(data,a,b,c)
     return(colours)
   }
+\end{Scode}
+
+See how this function takes the data and also has the values of \texttt{a}, \texttt{b},
+and \texttt{c} within it.
+
+Then we need to make sure we return the function with a new class, and a 'type' string
+which is a short description:
+
+\begin{Scode}
   class(f)= c("myScheme","colourScheme","function")
   attr(f,"type")="my scheme"
   return(f)
   }
-  
-schemeData.myScheme = function(object){
-  return(list(options=get("options",env=environment(object))))
-  } 
 \end{Scode}
+
+Finally, we write a \texttt{schemeData} method for our new scheme. It will
+be passed the function object with the arguments wrapped in its environment:
+
+\begin{Scode}
+schemeData.myScheme = function(object){
+  eo=environment(object)
+  return(list(a=get("a",env=eo),
+              b=get("b",env=eo),
+              c=get("c",env=eo)))
+} 
+\end{Scode}
+
+See the R code for the included functions for more.
 
 \section*{Examples}
 

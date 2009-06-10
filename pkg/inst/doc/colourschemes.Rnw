@@ -251,9 +251,9 @@ First, define a new scheme function:
 myScheme = function(a,b,c){
 \end{Scode}
 
-This function takes whatever data and options are needed. Then you need to make sure
-these options are evaluated in order to fix their values. Use the \texttt{force} function
-for this:
+This function takes whatever data and options are needed. Then you
+need to make sure these options are evaluated in order to fix their
+values. Use the \texttt{force} function for this:
 
 \begin{Scode}
   force(a)
@@ -270,11 +270,16 @@ Next we create a function within this function that only takes the new data as a
   }
 \end{Scode}
 
-See how this function takes the data and also has the values of \texttt{a}, \texttt{b},
-and \texttt{c} within it.
+Note that this function only takes the data as an argument, but it
+does have the values of \texttt{a}, \texttt{b}, and \texttt{c}
+available within it. These values will be in the environment of the
+function when it is called, since they are there as the function
+is created.
 
-Then we need to make sure we return the function with a new class, and a 'type' string
-which is a short description:
+
+Then we need to make sure we return the function with a new class, and
+a 'type' string attribute which is a short description used by the
+print method.
 
 \begin{Scode}
   class(f)= c("myScheme","colourScheme","function")
@@ -296,6 +301,68 @@ schemeData.myScheme = function(object){
 \end{Scode}
 
 See the R code for the included functions for more.
+
+\section*{Using colourschemes with \texttt{image}}
+
+Most base graphics functions such as \texttt{plot}, \texttt{lines} and friends
+have a \texttt{col=} argument to directly specify colours of plotted entities, no
+such option is available for the \texttt{image} function. This function can only plot
+against a colour palette.
+
+One way round this is to create a palette of the same length as the number of cells
+in the image, and create a matrix of the same shape as the data but containing the 
+values from 1 to the number of cells. Then we use \texttt{image} on that matrix,
+and the colour is then looked up in our long palette.
+
+In this example we create a modified version of the volcano dataset scaled to
+give us some negative values. We then use a colour scheme for topological
+data with a snowline at 1500 units:
+
+
+<<fig=TRUE>>=
+v=((volcano-94)*40)-2000
+vramp = multiRamp(rbind(c(-2000,0),c(0,1500),c(1500,max(v))),
+  list(c("black","blue"),c("green","brown"),c("gray70","white"))
+  )
+image(matrix(1:length(v),nrow=nrow(v)),col=vramp(v))
+title("Colour Scheme, exact")
+@ 
+
+This method is expensive in terms of memory since it involves the creation of two
+objects of the same size as your data, but it does produce the exact correct colours.
+Another option is to create a fixed palette from your colour scheme based on the
+range of your data:
+
+<<fig=TRUE>>=
+p=vramp(seq(min(v),max(v),len=50))
+image(v,col=p)
+title("Colour Scheme, approximate")
+@ 
+
+This gives an approximation to the exact colours, something most easily noticed in the 
+difference in the icecap. A better approximation can be made by using a longer
+palette.
+
+When reusing the colour scheme on a subset or other data set using this method just
+construct a palette from the range of the subset. Here we zoom in on part of the 
+volcano and use the same colour scheme:
+
+<<fig=TRUE>>=
+vs=v[20:40,40:60]
+ps=vramp(seq(min(vs),max(vs),len=50))
+image(vs,col=ps)
+title("Colour Scheme, approximate")
+@ 
+
+Note that the icecap now looks closer to the original region than before because
+we are using a better approximation for our palette - the 50 colours are now 
+interpolating between the smaller range of values in our subset matrix.
+
+The exact method for a subset looks like this:
+<<fig=TRUE>>=
+image(matrix(1:length(vs),nrow=nrow(vs)),col=vramp(vs))
+title("Colour Scheme, exact")
+@ 
 
 \section*{Examples}
 

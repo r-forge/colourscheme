@@ -1,6 +1,6 @@
 rampInterpolate <- function(limits,ramp,...){
   
-  rampFunction = colorRamp(ramp,...)
+  rampFunction = .colorRampAlpha(ramp,...)
   force(list(...))
   force(ramp)
   force(rampFunction)
@@ -8,7 +8,8 @@ rampInterpolate <- function(limits,ramp,...){
   f=function(data){
     t=(data-min(limits))/(max(limits)-min(limits))
     outside = t < 0.0 | t > 1.0
-    okColours = rgb(rampFunction(t[!outside])/255)
+    rf = rampFunction(t[!outside])
+    okColours = rgb(rf/255,alpha=rf[,4]/255)
     colours = rep(NA,length(data))
     colours[!outside] <- okColours
     return(colours)

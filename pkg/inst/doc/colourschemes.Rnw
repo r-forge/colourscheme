@@ -1,5 +1,5 @@
 \documentclass{article}
-
+%\VignetteIndexEntry{Create colour schemes from data}
 \usepackage{listings}
 \usepackage{Sweave}
 \SweaveOpts{keep.source=TRUE}

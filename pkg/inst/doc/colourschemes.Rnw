@@ -74,9 +74,20 @@ level of a factor. The function \texttt{factorScheme} does that:
 
 <<echo=FALSE,results=hide>>=
 library(colourschemes,lib.loc="../../../pkg.Rcheck")
-showScheme = function(limit,scheme){
+check <- 
+function(colours,n1,n2,nc=2,add=TRUE){
+  u = par()$usr
+  x = seq(u[1],u[2],len=n1+1)
+  y = seq(u[3],u[4],len=n2+1)
+  l = list(x=x,y=y,z=1 + outer(1:n1,1:n2,"+") %% nc)
+  image(l,col=colours,add=add)
+  return(invisible(l))
+}
+showScheme = function(limit,scheme,bg=FALSE){
   d=data.frame(x=limit,y=rep(0,length(limit)))
-  plot(d$x,d$y,col=scheme(d$x),pch=15,axes=FALSE,ylab="",xlab="",cex=2)
+  plot(range(d$x),c(-1,1),axes=FALSE,ylab="",xlab="",type="n")
+  if(bg){check(c("white","gray"),60,5,2)}
+  points(d$x,d$y,col=scheme(d$x),pch=15,cex=2)
   axis(1)
 }
 @ 
@@ -114,7 +125,7 @@ ns = nearestScheme(data.frame(
   values=c(0,1,2),col=c("red","blue","green")
   ))
 @ 
-<<fig=TRUE, width=6, height=2, echo=FALSE>>=
+<<fig=TRUE, width=6, height=2.2, echo=FALSE>>=
 showScheme(seq(-2.5,2.5,len=20),ns)
 @ 
 
@@ -128,7 +139,7 @@ RGB or CIE Lab colour space.
 <<>>=
 rs = rampInterpolate(limits=c(-2, 2), ramp = c("red", "yellow", "blue"))
 @ 
-<<fig=TRUE, width=6, height=2, echo=FALSE>>=
+<<fig=TRUE, width=6, height=2.2, echo=FALSE>>=
 showScheme(seq(-3,3,len=20),rs)
 @ 
 
@@ -141,7 +152,7 @@ through a palette for interpolation, such as one of the \texttt{RColorBrewer} pa
 require(RColorBrewer)
 rs2 = rampInterpolate(c(-2,2),brewer.pal(5,"PuOr"))
 @ 
-<<fig=TRUE, width=6, height=2, echo=FALSE>>=
+<<fig=TRUE, width=6, height=2.2, echo=FALSE>>=
 showScheme(seq(-2,2,len=20),rs2)
 @ 
 
@@ -165,10 +176,23 @@ tramp = multiRamp(rbind(c(-2000,0),c(0,1000),c(1000,9000)),
   list(c("black","blue"),c("green","brown"),c("gray70","gray70"))
   )
 @ 
-<<fig=TRUE, width=6, height=2, echo=FALSE>>=
+<<fig=TRUE, width=6, height=2.2, echo=FALSE>>=
 showScheme(seq(-2000,2000,len=20),tramp)
 @ 
 
+The package also supports transparency. The following colour scheme consists
+of three bands of red, yellow and blue with transparency that fades in and out.
+
+<<>>=
+threeband = multiRamp(rbind(c(0,1),c(1,2),c(2,3)),
+  list(c("#ff000000","#ff0000ff","#ff000000"),
+       c("#ffff0000","#ffff00ff","#ffff0000"),
+       c("#0000ff00","#0000ffff","#0000ff00")))
+@ 
+
+<<fig=TRUE, width=6, height=2.2, echo=FALSE>>=
+showScheme(seq(0,3,len=28),threeband,bg=TRUE)
+@ 
 
 \section*{Multivariate Continuous Colours}
 
@@ -238,7 +262,7 @@ sd$ranges[3,1]=1500
 tramp2 = do.call(multiRamp,sd)
 @ 
 
-<<fig=TRUE, width=6, height=2, echo=FALSE>>=
+<<fig=TRUE, width=6, height=2.2, echo=FALSE>>=
 showScheme(seq(-2000,2000,len=20),tramp2)
 @ 
 

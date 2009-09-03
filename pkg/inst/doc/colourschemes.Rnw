@@ -86,7 +86,7 @@ function(colours,n1,n2,nc=2,add=TRUE){
 showScheme = function(limit,scheme,bg=FALSE){
   d=data.frame(x=limit,y=rep(0,length(limit)))
   plot(range(d$x),c(-1,1),axes=FALSE,ylab="",xlab="",type="n")
-  if(bg){check(c("white","gray"),60,5,2)}
+  if(bg){check(c("white","gray50"),60,5,2)}
   points(d$x,d$y,col=scheme(d$x),pch=15,cex=2)
   axis(1)
 }
@@ -126,7 +126,7 @@ ns = nearestScheme(data.frame(
   ))
 @ 
 <<fig=TRUE, width=6, height=2.2, echo=FALSE>>=
-showScheme(seq(-2.5,2.5,len=20),ns)
+showScheme(seq(-2.5,2.5,len=20),ns,bg=TRUE)
 @ 
 
 
@@ -140,7 +140,7 @@ RGB or CIE Lab colour space.
 rs = rampInterpolate(limits=c(-2, 2), ramp = c("red", "yellow", "blue"))
 @ 
 <<fig=TRUE, width=6, height=2.2, echo=FALSE>>=
-showScheme(seq(-3,3,len=20),rs)
+showScheme(seq(-3,3,len=20),rs,bg=TRUE)
 @ 
 
 Note that colours outside the set limits are returned as \texttt{NA}, and so 
@@ -153,7 +153,7 @@ require(RColorBrewer)
 rs2 = rampInterpolate(c(-2,2),brewer.pal(5,"PuOr"))
 @ 
 <<fig=TRUE, width=6, height=2.2, echo=FALSE>>=
-showScheme(seq(-2,2,len=20),rs2)
+showScheme(seq(-2,2,len=20),rs2,bg=TRUE)
 @ 
 
 \subsection*{Multiple Ramp Interpolation}
@@ -177,7 +177,7 @@ tramp = multiRamp(rbind(c(-2000,0),c(0,1000),c(1000,9000)),
   )
 @ 
 <<fig=TRUE, width=6, height=2.2, echo=FALSE>>=
-showScheme(seq(-2000,2000,len=20),tramp)
+showScheme(seq(-2000,2000,len=20),tramp,bg=TRUE)
 @ 
 
 The package also supports transparency. The following colour scheme consists
@@ -263,7 +263,7 @@ tramp2 = do.call(multiRamp,sd)
 @ 
 
 <<fig=TRUE, width=6, height=2.2, echo=FALSE>>=
-showScheme(seq(-2000,2000,len=20),tramp2)
+showScheme(seq(-2000,2000,len=20),tramp2,bg=TRUE)
 @ 
 
 \section*{Writing Your Own Colour Schemes}
@@ -388,31 +388,38 @@ image(matrix(1:length(vs),nrow=nrow(vs)),col=vramp(vs))
 title("Colour Scheme, exact")
 @ 
 
-\section*{Examples}
+\section*{More Examples}
 
+The following code produces some more example colour schemes.
 
 <<fig=TRUE>>=
 set.seed(123)
 require(RColorBrewer)
-x=seq(-2.5,2.5,len=50)
+x=seq(-2.5, 2.5, len=50)
 srange = max(abs(range(x)))*c(-1,1)
 schemes = list()
 schemes[[length(schemes)+1]] =
-  nearestScheme(data.frame(values=c(-1.5,-0.5,0,0.5,1.5),col=brewer.pal(5,"Set3")))
+  nearestScheme(data.frame(values=c(-1.5,-0.5,0,0.5,1.5),
+                           col=brewer.pal(5,"Set3")))
 schemes[[length(schemes)+1]] =
-  rampInterpolate(c(-2,2),c("red","yellow","blue"))
+  rampInterpolate(c(-2,2), c("red","yellow","blue"))
 schemes[[length(schemes)+1]] =
-  rampInterpolate(c(-2,2),c("red","yellow","blue"),interpolate="spline",bias=0.3)
+  rampInterpolate(c(-2,2), c("red","yellow","blue"),
+                  interpolate="spline",bias=0.3)
 schemes[[length(schemes)+1]] =
-  rampInterpolate(c(-2,2),brewer.pal(5,"PuOr"))
+  rampInterpolate(c(-2,2), brewer.pal(5,"PuOr"))
 schemes[[length(schemes)+1]] =
-  rampInterpolate(srange,brewer.pal(5,"PuOr"))
+  rampInterpolate(srange, brewer.pal(5,"PuOr"))
 
 schemes[[length(schemes)+1]] =
-  multiRamp(rbind(c(-2,0),c(0,.6),c(.6,2)),list(c("black","blue"),c("yellow","brown"),c("green","white")))
+  multiRamp(rbind(c(-2,0), c(0,.6), c(.6,2)),
+            list(c("black","blue"),
+                 c("yellow","brown"),
+                 c("green","white")))
 
 nt = length(schemes)
-plot(srange,c(1,nt+1),type='n',xlab="",ylab="",axes=FALSE,main="colour schemes")
+plot(srange, c(1,nt+1), type='n', xlab="", ylab="",
+     axes=FALSE, main="colour schemes")
 axis(1)
 box()
 for(i in 1:nt){
@@ -423,7 +430,10 @@ for(i in 1:nt){
     points(xr,rep(i,length(xr))+.2*k,col=schemes[[i]](xr),pch=19,cex=1)
   }
   text(min(x),i+.4,class(schemes[[i]])[1],adj=c(0,.5))
-  legend(par()$usr[2],i+0.4,xjust=1,yjust=0.5,as.character(pretty(x)),fill=schemes[[i]](pretty(x)),horiz=TRUE,bty='n',cex=1,x.intersp=.1,text.width=0.05)
+  legend(par()$usr[2],i+0.4,xjust=1,yjust=0.5,
+         as.character(pretty(x)),
+         fill=schemes[[i]](pretty(x)),
+         horiz=TRUE,bty='n',cex=1,x.intersp=.1,text.width=0.05)
 }
 
 @ 

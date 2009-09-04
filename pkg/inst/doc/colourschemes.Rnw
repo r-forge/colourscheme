@@ -68,7 +68,7 @@ be sure that the mapping of data values to colours is constant.
 
 \section*{Colours For Factors}
 
-A simple colour scheme function is one that produces a colour for each
+A very simple colour scheme is one that produces a colour for each
 level of a factor. The function \texttt{factorScheme} does that:
 
 
@@ -329,7 +329,7 @@ See the R code for the included functions for more.
 \section*{Using colourschemes with \texttt{image}}
 
 Most base graphics functions such as \texttt{plot}, \texttt{lines} and friends
-have a \texttt{col=} argument to directly specify colours of plotted entities, no
+have a \texttt{col=} argument to directly specify colours of plotted entities. However, no
 such option is available for the \texttt{image} function. This function can only plot
 against a colour palette.
 
@@ -352,7 +352,7 @@ image(matrix(1:length(v),nrow=nrow(v)),col=vramp(v))
 title("Colour Scheme, exact")
 @ 
 
-This method is expensive in terms of memory since it involves the creation of two
+This method is expensive in terms of memory since it involves the creation of
 objects of the same size as your data, but it does produce the exact correct colours.
 Another option is to create a fixed palette from your colour scheme based on the
 range of your data:
@@ -367,7 +367,7 @@ This gives an approximation to the exact colours, something most easily noticed 
 difference in the icecap. A better approximation can be made by using a longer
 palette.
 
-When reusing the colour scheme on a subset or other data set using this method just
+When reusing the colour scheme on a subset or other data set using this method, just
 construct a palette from the range of the subset. Here we zoom in on part of the 
 volcano and use the same colour scheme:
 

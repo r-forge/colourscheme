@@ -3,24 +3,20 @@
 \alias{schemeData.factorScheme}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-The Function schemeData.factorScheme
+Return scheme data for a factor scheme
 }
 \description{
-One line description of schemeData.factorScheme
+Return scheme data for a factor scheme
 }
 \usage{
-schemeData.factorScheme(object)
+\method{schemeData}{factorScheme}(object)
 }
 \arguments{
-  \item{object}{argument  object}
-}
-
-\details{
-The details of schemeData.factorScheme
+  \item{object}{a factorScheme object}
 }
 
 \value{
-The value of schemeData.factorScheme
+Returns a list of the scheme data for the colour scheme.
 }
 
 \author{

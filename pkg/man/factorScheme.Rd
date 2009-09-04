@@ -1,33 +1,37 @@
 \name{factorScheme}
 \Rdversion{1.1}
 \alias{factorScheme}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
-The Function factorScheme
+Generate colour schemes for factor data.
 }
 \description{
-One line description of factorScheme
+Return a colour scheme that generates a colour for each level of
+a factor.
 }
 \usage{
 factorScheme(fac, colours)
 }
 \arguments{
-  \item{fac}{argument  fac}
-  \item{colours}{argument  colours}
-}
-
-\details{
-The details of factorScheme
+  \item{fac}{A factor}
+  \item{colours}{The colours for the levels of the factor}
 }
 
 \value{
-The value of factorScheme
+A colourscheme function.
 }
 
 \author{
 Barry Rowlingson <b.rowlingson@lancaster.ac.uk>
 }
 
+\examples{
+f = factor (c("a","a","b","a","c"))
+fs = factorScheme (f,c("red"," blue "," green "))
+fs(f)
+g = factor (c("c","b","a"))
+fs(g)
+}
 
 
 \keyword{color}

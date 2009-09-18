@@ -1,5 +1,6 @@
 \documentclass{article}
 %\VignetteIndexEntry{Create colour schemes from data}
+%\VignetteDepends{colourschemes}
 \usepackage{listings}
 \usepackage{Sweave}
 \SweaveOpts{keep.source=TRUE}
@@ -73,7 +74,7 @@ level of a factor. The function \texttt{factorScheme} does that:
 
 
 <<echo=FALSE,results=hide>>=
-library(colourschemes,lib.loc="../../../pkg.Rcheck")
+library(colourschemes)
 check <- 
 function(colours,n1,n2,nc=2,add=TRUE){
   u = par()$usr

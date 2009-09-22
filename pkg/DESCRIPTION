@@ -5,7 +5,7 @@ Version: 0.3
 Date: 2009-09-04
 Author: Barry Rowlingson
 Maintainer: Barry Rowlingson <b.rowlingson@lancaster.ac.uk>
-Depends: R (>= 2.7.0), RColorBrewer, colorRamps
+Depends: R (>= 2.7.0), RColorBrewer
 Description: Create functions for mapping data to colours
 License: GPL-3
 LazyLoad: yes

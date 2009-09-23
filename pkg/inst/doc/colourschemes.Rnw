@@ -1,13 +1,13 @@
 \documentclass{article}
 %\VignetteIndexEntry{Create colour schemes from data}
 %\VignetteDepends{colourschemes}
-\usepackage{listings}
+%\usepackage{listings}
 \usepackage{Sweave}
 \SweaveOpts{keep.source=TRUE}
-<<<SweaveListingspreparations, results=tex, echo=FALSE>>=
-require(SweaveListingUtils)
-SweaveListingPreparations()
-@
+%<<<SweaveListingspreparations, results=tex, echo=FALSE>>=
+%require(SweaveListingUtils)
+%SweaveListingPreparations()
+%@
 
 \title{Colour Schemes}
 
